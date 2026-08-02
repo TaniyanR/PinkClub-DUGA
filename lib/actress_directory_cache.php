@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 function pcf_actress_directory_cache_dir(): string
 {
-    return dirname(__DIR__) . '/storage/cache/actress-directory-public-v2';
+    return dirname(__DIR__) . '/storage/cache/actress-directory-public-v3';
 }
 
 function pcf_actress_directory_cache_manifest_path(): string
@@ -110,13 +110,13 @@ function pcf_actress_directory_cache_rebuild(bool $force = false): array
             }
 
             $id = (int)($row['id'] ?? 0);
-            $dmmId = trim((string)($row['duga_id'] ?? ''));
+            $dugaId = trim((string)($row['duga_id'] ?? ''));
             $name = trim((string)($row['name'] ?? ''));
-            $dedupeKey = $dmmId !== '' ? 'dmm:' . $dmmId : 'id:' . $id;
+            $dedupeKey = $dugaId !== '' ? 'duga:' . $dugaId : 'id:' . $id;
             if ($id <= 0 || $name === '' || isset($seen[$dedupeKey])) {
                 continue;
             }
-            if (pcf_actress_directory_invalid_name($name) || str_starts_with($dmmId, 'name:') || !ctype_digit($dmmId)) {
+            if (pcf_actress_directory_invalid_name($name)) {
                 continue;
             }
 

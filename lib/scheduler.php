@@ -135,7 +135,7 @@ function scheduler_run_items_schedule(DugaSyncService $service, array $settings)
         $pdo->prepare("UPDATE sync_job_state SET lock_until = NULL, updated_at = NOW() WHERE job_key = 'items'")->execute();
         return $skip;
     }
-    $normalizerVersion = '5';
+    $normalizerVersion = '6';
     $needsNormalizerRefresh = site_setting_get('duga_normalizer_version', '') !== $normalizerVersion;
     $stateStmt = $pdo->prepare("SELECT next_offset FROM sync_job_state WHERE job_key = 'items' LIMIT 1");
     $stateStmt->execute();

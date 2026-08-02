@@ -252,6 +252,10 @@ function fetch_public_actresses(int $limit = 10000, int $offset = 0, string $ord
     $limit = normalize_int($limit, 1, 10000);
     $offset = max(0, $offset);
 
+    // DUGAには独立した女優APIがないため、商品APIのperformerから
+    // 保存済みの関連データを女優マスターへ反映してから公開一覧を取得する。
+    backfill_master_from_relation('actresses', 'item_actresses', 'actress_name');
+
     try {
         $stmt = db()->prepare(
             "SELECT actresses.*
@@ -840,11 +844,12 @@ function fetch_item_actresses(string $contentId): array
 
     try {
         $sql = db_column_exists('item_actresses', 'item_id')
-            ? 'SELECT DISTINCT 0 AS id, item_actresses.actress_name AS name
+            ? 'SELECT DISTINCT actresses.id, actresses.name, actresses.ruby, actresses.birthday, actresses.prefectures, actresses.image_url, actresses.image_small, actresses.image_large
                FROM items
                INNER JOIN item_actresses ON items.id = item_actresses.item_id
+               INNER JOIN actresses ON actresses.duga_id = item_actresses.duga_id
                WHERE items.content_id = :cid
-               ORDER BY item_actresses.actress_name ASC'
+               ORDER BY actresses.name ASC'
             : 'SELECT actresses.*
                FROM actresses
                INNER JOIN item_actresses ON actresses.id = item_actresses.actress_id
