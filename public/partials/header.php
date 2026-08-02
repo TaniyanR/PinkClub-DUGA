@@ -138,6 +138,29 @@ $relNextHref = isset($relNext) && is_string($relNext) && $relNext !== '' ? $relN
         img.dataset.imageFallbackReady = '1';
         if (!fallbacks.length) return;
 
+        if (img.dataset.preferPortrait === '1') {
+          const candidates = [img.currentSrc || img.src, ...fallbacks]
+            .map((url) => String(url || '').trim())
+            .filter((url, candidateIndex, values) => url && values.indexOf(url) === candidateIndex);
+
+          const selectPortraitCandidate = (candidateIndex = 0) => {
+            if (candidateIndex >= candidates.length) return;
+            const candidateUrl = candidates[candidateIndex];
+            const probe = new Image();
+            probe.onload = () => {
+              if (probe.naturalHeight > probe.naturalWidth) {
+                if (img.src !== candidateUrl) img.src = candidateUrl;
+                return;
+              }
+              selectPortraitCandidate(candidateIndex + 1);
+            };
+            probe.onerror = () => selectPortraitCandidate(candidateIndex + 1);
+            probe.src = candidateUrl;
+          };
+
+          selectPortraitCandidate();
+        }
+
         let index = 0;
         const useNextFallback = () => {
           while (index < fallbacks.length && fallbacks[index] === img.currentSrc) {
