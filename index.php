@@ -363,12 +363,9 @@ function render_item_card(array $item, int $width = 180, ?array $taxonomy = null
     $movieClass = $sample['movie_url'] !== '' ? 'sample-button sample-button--enabled' : 'sample-button sample-button--disabled';
     $imageClass = $sample['has_images'] ? 'sample-button sample-button--enabled' : 'sample-button sample-button--disabled';
     $sampleImagesUrl = public_url('sample_images.php?content_id=' . rawurlencode((string)($item['content_id'] ?? '')));
-    $thumbUrl = trim((string)($item['image_small'] ?? ''));
-    if ($preferFullPackageImage) {
-        $fullPackageImage = pick_full_package_image($item);
-        if ($fullPackageImage !== '') {
-            $thumbUrl = $fullPackageImage;
-        }
+    $thumbUrl = pick_full_package_image($item);
+    if ($thumbUrl === '') {
+        $thumbUrl = trim((string)($item['image_small'] ?? ''));
     }
     if ($thumbUrl === '') {
         $thumbUrl = trim((string)($item['image_large'] ?? ''));

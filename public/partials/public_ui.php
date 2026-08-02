@@ -110,39 +110,51 @@ if (!function_exists('pcf_is_self_hosted_duga_image_url')) {
     }
 }
 
-if (!function_exists('pcf_first_image_from_mixed')) {
-    function pcf_first_image_from_mixed(mixed $value): string
+if (!function_exists('pcf_image_candidates_from_mixed')) {
+    function pcf_image_candidates_from_mixed(mixed $value): array
     {
         $value = pcf_maybe_decode_json_value($value);
         if (is_string($value)) {
+            $candidates = [];
             foreach (pcf_parse_image_urls($value) as $candidate) {
                 $v = trim((string)$candidate);
                 if (pcf_looks_like_image_url($v)) {
-                    return $v;
+                    $candidates[] = $v;
                 }
             }
-            return '';
+            return array_values(array_unique($candidates));
         }
         if (!is_array($value)) {
-            return '';
+            return [];
         }
 
-        foreach (['large', 'small', 'list', 'image', 'url', 'src', 'value'] as $key) {
-            if (array_key_exists($key, $value)) {
-                $candidate = pcf_first_image_from_mixed($value[$key]);
-                if ($candidate !== '') {
-                    return $candidate;
+        $candidates = [];
+        $visitedKeys = [];
+        foreach (['large', 'original', 'full', 'midium', 'medium', 'small', 'list', 'image', 'url', 'src', 'value'] as $preferredKey) {
+            foreach ($value as $key => $child) {
+                $normalizedKey = is_string($key) ? strtolower(str_replace(['_', '-'], '', $key)) : '';
+                if ($normalizedKey !== $preferredKey) {
+                    continue;
                 }
+                $visitedKeys[(string)$key] = true;
+                $candidates = array_merge($candidates, pcf_image_candidates_from_mixed($child));
             }
         }
 
-        foreach ($value as $child) {
-            $candidate = pcf_first_image_from_mixed($child);
-            if ($candidate !== '') {
-                return $candidate;
+        foreach ($value as $key => $child) {
+            if (isset($visitedKeys[(string)$key])) {
+                continue;
             }
+            $candidates = array_merge($candidates, pcf_image_candidates_from_mixed($child));
         }
-        return '';
+        return array_values(array_unique($candidates));
+    }
+}
+
+if (!function_exists('pcf_first_image_from_mixed')) {
+    function pcf_first_image_from_mixed(mixed $value): string
+    {
+        return (string)(pcf_image_candidates_from_mixed($value)[0] ?? '');
     }
 }
 
@@ -301,7 +313,10 @@ if (!function_exists('pcf_item_image_candidates')) {
             $raw = pcf_maybe_decode_json_value($rawJson);
             if (is_array($raw)) {
                 foreach (['jacketimage', 'packageimagelarge', 'packageimage', 'package', 'jacket', 'packageImage', 'poster', 'posterimage'] as $rawKey) {
-                    $rawPackageCandidates[] = pcf_first_image_from_mixed($raw[$rawKey] ?? null);
+                    $rawPackageCandidates = array_merge(
+                        $rawPackageCandidates,
+                        pcf_image_candidates_from_mixed($raw[$rawKey] ?? null)
+                    );
                 }
                 $rawPackageCandidates[] = (string)($raw['packageImage']['large'] ?? '');
                 $rawPackageCandidates[] = (string)($raw['packageImage']['small'] ?? '');
@@ -322,9 +337,9 @@ if (!function_exists('pcf_item_image_candidates')) {
             $value = trim((string)$candidate);
             return $value !== '' && !pcf_is_self_hosted_duga_image_url($value) ? $value : '';
         }, array_merge(
-            $packageCandidates,
-            $explicitPackageCandidates,
             $rawPackageCandidates,
+            $explicitPackageCandidates,
+            $packageCandidates,
             $sampleCandidates
         )))));
     }

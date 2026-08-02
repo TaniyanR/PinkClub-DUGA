@@ -199,6 +199,20 @@ final class DugaNormalizer
         if (!is_array($value)) {
             return null;
         }
+
+        foreach (['large', 'original', 'full', 'midium', 'medium', 'small'] as $preferredKey) {
+            foreach ($value as $key => $child) {
+                $normalizedKey = is_string($key) ? strtolower(str_replace(['_', '-'], '', $key)) : '';
+                if ($normalizedKey !== $preferredKey) {
+                    continue;
+                }
+                $url = self::firstUrl($child);
+                if ($url !== null) {
+                    return $url;
+                }
+            }
+        }
+
         foreach ($value as $child) {
             $url = self::firstUrl($child);
             if ($url !== null) {
