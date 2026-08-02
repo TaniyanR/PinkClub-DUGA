@@ -84,7 +84,7 @@ require __DIR__ . '/partials/header.php';
 <script>
 (() => {
   const detailBase = <?= json_encode(public_url('actress.php') . '?id=', JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
-  const groupEndpoint = <?= json_encode(public_url('actresses_group.php') . '?group=', JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
+  const groupEndpoint = <?= json_encode(public_url('actresses_group.php') . '?v=2&group=', JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
   const placeholder = <?= json_encode(pcf_placeholder_data_uri('No Photo'), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
 
   const appendRows = (container, rows) => {

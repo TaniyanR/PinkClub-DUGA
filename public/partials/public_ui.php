@@ -288,24 +288,25 @@ if (!function_exists('pcf_item_image_candidates')) {
     function pcf_item_image_candidates(array $item): array
     {
         $packageCandidates = pcf_duga_package_image_candidates($item);
-        $candidates = [
+        $explicitPackageCandidates = [
             (string)($item['full_package_url'] ?? ''),
             (string)($item['package_image_url'] ?? ''),
             (string)($item['package_image_large'] ?? ''),
             (string)($item['package_image_small'] ?? ''),
         ];
+        $rawPackageCandidates = [];
 
         $rawJson = (string)($item['raw_json'] ?? '');
         if ($rawJson !== '') {
             $raw = pcf_maybe_decode_json_value($rawJson);
             if (is_array($raw)) {
                 foreach (['jacketimage', 'packageimagelarge', 'packageimage', 'package', 'jacket', 'packageImage', 'poster', 'posterimage'] as $rawKey) {
-                    $candidates[] = pcf_first_image_from_mixed($raw[$rawKey] ?? null);
+                    $rawPackageCandidates[] = pcf_first_image_from_mixed($raw[$rawKey] ?? null);
                 }
-                $candidates[] = (string)($raw['packageImage']['large'] ?? '');
-                $candidates[] = (string)($raw['packageImage']['small'] ?? '');
-                $candidates[] = (string)($raw['imageURL']['large'] ?? '');
-                $candidates[] = (string)($raw['imageURL']['small'] ?? '');
+                $rawPackageCandidates[] = (string)($raw['packageImage']['large'] ?? '');
+                $rawPackageCandidates[] = (string)($raw['packageImage']['small'] ?? '');
+                $rawPackageCandidates[] = (string)($raw['imageURL']['large'] ?? '');
+                $rawPackageCandidates[] = (string)($raw['imageURL']['small'] ?? '');
             }
         }
 
@@ -320,7 +321,12 @@ if (!function_exists('pcf_item_image_candidates')) {
         return array_values(array_unique(array_filter(array_map(static function ($candidate): string {
             $value = trim((string)$candidate);
             return $value !== '' && !pcf_is_self_hosted_duga_image_url($value) ? $value : '';
-        }, array_merge($candidates, $packageCandidates, $sampleCandidates)))));
+        }, array_merge(
+            $packageCandidates,
+            $explicitPackageCandidates,
+            $rawPackageCandidates,
+            $sampleCandidates
+        )))));
     }
 }
 
