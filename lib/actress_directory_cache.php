@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 function pcf_actress_directory_cache_dir(): string
 {
-    return dirname(__DIR__) . '/storage/cache/actress-directory-public-v3';
+    return dirname(__DIR__) . '/storage/cache/actress-directory-public-v4';
 }
 
 function pcf_actress_directory_cache_manifest_path(): string
@@ -72,7 +72,7 @@ function pcf_actress_directory_group_key(array $row): string
         }
     }
 
-    return preg_match('/^[A-Za-z]/', $first) ? 'alpha:' . strtoupper($first) : '';
+    return preg_match('/^[A-Za-z]/', $first) ? 'alpha:' . strtoupper($first) : 'other';
 }
 
 function pcf_actress_directory_cache_rebuild(bool $force = false): array
@@ -150,6 +150,9 @@ function pcf_actress_directory_cache_rebuild(bool $force = false): array
         $alphaKeys = array_values(array_filter(array_keys($groups), static fn(string $key): bool => str_starts_with($key, 'alpha:')));
         sort($alphaKeys, SORT_STRING);
         $orderedKeys = array_merge($orderedKeys, $alphaKeys);
+        if (($groups['other'] ?? []) !== []) {
+            $orderedKeys[] = 'other';
+        }
 
         $manifestGroups = [];
         foreach ($orderedKeys as $key) {
@@ -168,8 +171,8 @@ function pcf_actress_directory_cache_rebuild(bool $force = false): array
 
             $manifestGroups[] = [
                 'key' => $key,
-                'label' => substr($key, 0, 5) === 'kana:' ? mb_substr($key, 5) : substr($key, 6),
-                'type' => str_starts_with($key, 'kana:') ? 'kana' : 'alpha',
+                'label' => $key === 'other' ? 'その他' : (str_starts_with($key, 'kana:') ? mb_substr($key, 5) : substr($key, 6)),
+                'type' => $key === 'other' ? 'other' : (str_starts_with($key, 'kana:') ? 'kana' : 'alpha'),
                 'count' => count($groupRows),
                 'file' => $filename,
             ];

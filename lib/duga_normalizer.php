@@ -52,9 +52,42 @@ final class DugaNormalizer
                 $name = trim($entry);
                 $ruby = null;
             } elseif (is_array($entry)) {
-                $id = trim((string)($entry['id'] ?? ''));
-                $name = trim((string)($entry['name'] ?? ''));
-                $ruby = self::string($entry['kana'] ?? null);
+                $id = '';
+                foreach (['id', 'performerid', 'categoryid', 'seriesid', 'directorid', 'labelid'] as $idKey) {
+                    $candidate = self::string($entry[$idKey] ?? null);
+                    if ($candidate !== null) {
+                        $id = $candidate;
+                        break;
+                    }
+                }
+
+                $name = '';
+                foreach (['name', 'performername', 'categoryname', 'seriesname', 'directorname', 'labelname', 'value', 'text'] as $nameKey) {
+                    $candidate = self::string($entry[$nameKey] ?? null);
+                    if ($candidate !== null) {
+                        $name = $candidate;
+                        break;
+                    }
+                }
+
+                $ruby = null;
+                foreach (['kana', 'ruby', 'furigana'] as $rubyKey) {
+                    $ruby = self::string($entry[$rubyKey] ?? null);
+                    if ($ruby !== null) {
+                        break;
+                    }
+                }
+
+                if ($name === '') {
+                    foreach ($entry as $child) {
+                        if (is_array($child)) {
+                            foreach (self::list($child) as $nested) {
+                                $queue[] = $nested;
+                            }
+                        }
+                    }
+                    continue;
+                }
             } else {
                 continue;
             }

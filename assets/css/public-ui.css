@@ -787,6 +787,24 @@
 .pcf-item-main__info table {
   table-layout: fixed;
 }
+.pcf-item-main__media {
+  width: min(100%, 460px);
+}
+.pcf-item-main__media > a {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: flex-start;
+}
+.pcf-item-main__media .pcf-detail__package {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+  object-position: center top;
+}
 .pcf-item-main__info th {
   width: 120px;
 }

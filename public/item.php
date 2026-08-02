@@ -704,10 +704,10 @@ require __DIR__ . '/partials/header.php';
   <?php endif; ?>
 
   <section class="pcf-detail pcf-item-main">
-    <div class="pcf-item-main__media" style="width:min(100%, 620px);">
+    <div class="pcf-item-main__media">
       <?php if ($packageImage !== ''): ?>
       <a href="<?= e($packageImage) ?>" target="_blank" rel="noopener noreferrer">
-        <img class="pcf-detail__package" data-package-image="1" src="<?= e($packageImage) ?>" alt="<?= e((string)($item['title'] ?? '')) ?>"<?= $packageImageFallbackAttr ?> style="display:block; width:100%; height:auto;">
+        <img class="pcf-detail__package" data-package-image="1" src="<?= e($packageImage) ?>" alt="<?= e((string)($item['title'] ?? '')) ?>"<?= $packageImageFallbackAttr ?>>
       </a>
       <?php endif; ?>
     </div>
