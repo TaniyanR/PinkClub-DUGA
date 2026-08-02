@@ -12,14 +12,16 @@ if (session_status() === PHP_SESSION_ACTIVE) {
 }
 
 header('Content-Type: application/json; charset=UTF-8');
-header('Cache-Control: public, max-age=3600');
 
 $key = trim((string)get('group', ''));
-if (!preg_match('/\A(?:kana:[あかさたなはまやらわ]|alpha:[A-Z])\z/u', $key)) {
+if (!preg_match('/\A(?:kana:[あかさたなはまやらわ]|alpha:[A-Z]|other)\z/u', $key)) {
+    header('Cache-Control: no-store, max-age=0');
     http_response_code(400);
     echo json_encode(['success' => false, 'rows' => []], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }
+
+header('Cache-Control: public, max-age=3600');
 
 try {
     echo json_encode([

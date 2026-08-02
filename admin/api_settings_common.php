@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $s = settings_get();
             $beforeCount = (int)db()->query('SELECT COUNT(*) FROM items')->fetchColumn();
-            $normalizerVersion = '6';
+            $normalizerVersion = '8';
             $needsNormalizerRefresh = site_setting_get('duga_normalizer_version', '') !== $normalizerVersion;
             $testOffset = $needsNormalizerRefresh
                 ? 1

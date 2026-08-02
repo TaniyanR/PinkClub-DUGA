@@ -26,6 +26,7 @@ function pcf_public_page_cache_start(int $ttlSeconds = 120): void
         'reset_password.php',
         'setup_check.php',
         'ranking_refresh.php',
+        'recently_viewed_items.php',
         'link_apply.php',
         'deletion_request_submit.php',
         'page.php',
@@ -78,7 +79,7 @@ function pcf_public_page_cache_start(int $ttlSeconds = 120): void
     if ($normalizedQuery !== '') {
         $normalizedRequestUri .= '?' . $normalizedQuery;
     }
-    $cacheKey = hash('sha256', 'v7|' . $host . '|' . $variant . '|' . $normalizedRequestUri);
+    $cacheKey = hash('sha256', 'v14|' . $host . '|' . $variant . '|' . $normalizedRequestUri);
     $cacheFile = $cacheDirectory . '/' . $cacheKey . '.html';
 
     if (is_file($cacheFile) && (time() - (int)filemtime($cacheFile)) < $ttlSeconds) {

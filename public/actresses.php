@@ -33,21 +33,24 @@ foreach (($manifest['groups'] ?? []) as $group) {
     }
 }
 ksort($alphaGroups);
+$hasIndexedGroups = $kanaGroups !== [] || $alphaGroups !== [];
 
 $title = '女優一覧';
 require __DIR__ . '/partials/header.php';
 ?>
 <?php pcf_render_hero('女優一覧', '気になる女優のプロフィールと出演作品へ。'); ?>
 
-<?php if ($kanaGroups !== [] || $alphaGroups !== [] || $otherGroup !== ''): ?>
-  <nav class="pcf-index-nav">
+<?php if ($hasIndexedGroups || $otherGroup !== ''): ?>
+  <?php if ($hasIndexedGroups): ?>
+    <nav class="pcf-index-nav">
     <?php foreach ($kanaOrder as $kana): ?>
       <?php if (!isset($kanaGroups[$kana])): continue; endif; ?>
       <a class="pcf-index-nav__item" href="#actress-kana-<?= e(rawurlencode($kana)) ?>"><?= e($kana) ?></a>
     <?php endforeach; ?>
     <?php if ($alphaGroups !== []): ?><a class="pcf-index-nav__item" href="#actress-alpha">A-Z</a><?php endif; ?>
-    <?php if ($otherGroup !== ''): ?><a class="pcf-index-nav__item" href="#actress-other">その他</a><?php endif; ?>
-  </nav>
+    <?php if ($otherGroup !== ''): ?><a class="pcf-index-nav__item" href="#actress-unclassified">読み仮名未登録</a><?php endif; ?>
+    </nav>
+  <?php endif; ?>
 
   <div class="pcf-actress-directory">
     <?php foreach ($kanaOrder as $kana): ?>
@@ -71,8 +74,8 @@ require __DIR__ . '/partials/header.php';
     <?php endif; ?>
 
     <?php if ($otherGroup !== ''): ?>
-      <section class="pcf-index-block" id="actress-other" style="content-visibility:auto;contain-intrinsic-size:700px;">
-        <h2 class="pcf-section-title">その他</h2>
+      <section class="pcf-index-block"<?= $hasIndexedGroups ? ' id="actress-unclassified"' : '' ?> style="content-visibility:auto;contain-intrinsic-size:700px;">
+        <?php if ($hasIndexedGroups): ?><h2 class="pcf-section-title">読み仮名未登録</h2><?php endif; ?>
         <div class="pcf-list-card__meta" data-actress-lazy-group="<?= e($otherGroup) ?>" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;"></div>
       </section>
     <?php endif; ?>
@@ -84,7 +87,7 @@ require __DIR__ . '/partials/header.php';
 <script>
 (() => {
   const detailBase = <?= json_encode(public_url('actress.php') . '?id=', JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
-  const groupEndpoint = <?= json_encode(public_url('actresses_group.php') . '?group=', JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
+  const groupEndpoint = <?= json_encode(public_url('actresses_group.php') . '?v=2&group=', JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
   const placeholder = <?= json_encode(pcf_placeholder_data_uri('No Photo'), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
 
   const appendRows = (container, rows) => {

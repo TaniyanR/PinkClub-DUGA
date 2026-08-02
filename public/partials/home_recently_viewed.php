@@ -1,11 +1,10 @@
 <?php
 declare(strict_types=1);
 ?>
-<section id="pcf-recently-viewed" class="pcf-recent" aria-labelledby="pcf-recent-title" hidden>
+<section id="pcf-recently-viewed" class="pcf-recent" aria-labelledby="pcf-recent-title" data-endpoint="<?= e(public_url('recently_viewed_items.php')) ?>" hidden>
   <div class="pcf-recent__heading">
     <div>
       <h2 id="pcf-recent-title">最近見た作品</h2>
-      <p>閲覧履歴は、このブラウザ内だけに保存されます。</p>
     </div>
     <div class="pcf-recent__heading-actions">
       <button id="pcf-recent-hide" class="pcf-recent__control" type="button" onclick="try{localStorage.setItem('pcf_recently_viewed_hidden_v1','1')}catch(e){}var s=document.getElementById('pcf-recently-viewed');var r=document.getElementById('pcf-recent-restore');if(s)s.hidden=true;if(r)r.hidden=false;">履歴を表示しない</button>

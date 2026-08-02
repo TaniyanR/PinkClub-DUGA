@@ -876,6 +876,24 @@ require __DIR__ . '/partials/header.php';
     imageViewerMain.src = '';
   };
 
+  const packageImage = document.querySelector('[data-package-image="1"]');
+  const adjustPackageImage = () => {
+    if (!packageImage || !packageImage.naturalWidth || !packageImage.naturalHeight) return;
+    if (packageImage.naturalHeight <= packageImage.naturalWidth) return;
+    packageImage.style.width = 'auto';
+    packageImage.style.maxWidth = '100%';
+    packageImage.style.height = '400px';
+    packageImage.style.maxHeight = '400px';
+    packageImage.style.objectFit = 'contain';
+    packageImage.style.objectPosition = 'center top';
+    packageImage.style.marginLeft = 'auto';
+    packageImage.style.marginRight = 'auto';
+  };
+  if (packageImage) {
+    packageImage.addEventListener('load', adjustPackageImage);
+    if (packageImage.complete) adjustPackageImage();
+  }
+
   const closeMovie = () => {
     if (!modal || !frame || !titleNode) return;
     modal.classList.remove('is-open');
