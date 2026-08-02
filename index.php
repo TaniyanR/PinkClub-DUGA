@@ -389,7 +389,7 @@ function pick_top_card_image_candidates(array $item): array
     ))));
 }
 
-function render_item_card(array $item, int $width = 180, ?array $taxonomy = null, bool $preferFullPackageImage = false, bool $lazyLoad = true): void
+function render_item_card(array $item, int $width = 180, ?array $taxonomy = null, bool $preferFullPackageImage = false, bool $lazyLoad = true, bool $preferPortraitImage = false): void
 {
     $itemUrl = app_url('public/item.php?id=' . (int)$item['id']);
     $title = (string)($item['title'] ?? '');
@@ -407,10 +407,11 @@ function render_item_card(array $item, int $width = 180, ?array $taxonomy = null
     $thumbUrl = (string)($imageCandidates[0] ?? '');
     $imageFallbacks = array_slice($imageCandidates, 1);
     $imageFallbackAttr = $imageFallbacks !== [] ? ' data-image-fallbacks="' . e((string)json_encode($imageFallbacks, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) . '"' : '';
+    $portraitImageAttr = $preferPortraitImage ? ' data-prefer-portrait="1"' : '';
     ?>
     <article class="card rail-card rail-card--<?= (int)$width ?>" style="width:<?= (int)$width ?>px;min-width:<?= (int)$width ?>px;max-width:<?= (int)$width ?>px;">
       <?php if ($thumbUrl !== ''): ?>
-        <a href="<?= e($itemUrl) ?>"><img class="thumb" src="<?= e($thumbUrl) ?>" alt="<?= e($title) ?>"<?= $lazyLoad ? ' loading="lazy"' : '' ?> decoding="async"<?= $imageFallbackAttr ?> style="width:<?= (int)$width ?>px;max-width:<?= (int)$width ?>px;"></a>
+        <a href="<?= e($itemUrl) ?>"><img class="thumb" src="<?= e($thumbUrl) ?>" alt="<?= e($title) ?>"<?= $lazyLoad ? ' loading="lazy"' : '' ?> decoding="async"<?= $imageFallbackAttr ?><?= $portraitImageAttr ?> style="width:<?= (int)$width ?>px;max-width:<?= (int)$width ?>px;"></a>
       <?php else: ?>
         <div class="rail-card__noimage" style="width:<?= (int)$width ?>px;height:<?= (int)$width ?>px;">画像なし</div>
       <?php endif; ?>
@@ -684,7 +685,7 @@ $hasHomeContent = $newReleaseTop !== []
 <?php else: ?>
   <section class="rail-section only-pc home-feature-section">
     <h2>新作作品</h2>
-    <div class="rail-row rail-row--210 rail-row--no-scroll rail-row--top-shift rail-row--between-gap"><?php foreach ($newReleaseTop as $item) { render_item_card($item, 210, null, false, false); } ?></div>
+    <div class="rail-row rail-row--210 rail-row--no-scroll rail-row--top-shift rail-row--between-gap"><?php foreach ($newReleaseTop as $item) { render_item_card($item, 210, null, false, false, true); } ?></div>
     <div class="rail-row rail-row--200 rail-row--wide-thumb rail-row--bottom-scroll rail-row--bottom-horizontal rail-row--home-taxonomy"><?php foreach ($newReleaseBottom as $item) { render_item_card($item, 200, null, true); } ?></div>
   </section>
   <section class="rail-section only-sp">
@@ -694,7 +695,7 @@ $hasHomeContent = $newReleaseTop !== []
 
   <section class="rail-section only-pc home-feature-section">
     <h2>新着作品</h2>
-    <div class="rail-row rail-row--210 rail-row--no-scroll rail-row--top-shift rail-row--between-gap"><?php foreach ($latestTop as $item) { render_item_card($item, 210, null, false, false); } ?></div>
+    <div class="rail-row rail-row--210 rail-row--no-scroll rail-row--top-shift rail-row--between-gap"><?php foreach ($latestTop as $item) { render_item_card($item, 210, null, false, false, true); } ?></div>
     <div class="rail-row rail-row--200 rail-row--wide-thumb rail-row--bottom-scroll rail-row--bottom-horizontal rail-row--home-taxonomy"><?php foreach ($latestBottom as $item) { render_item_card($item, 200, null, true); } ?></div>
   </section>
   <section class="rail-section only-sp">
