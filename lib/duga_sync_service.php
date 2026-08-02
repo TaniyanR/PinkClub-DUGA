@@ -332,6 +332,7 @@ class DugaSyncService
     private function insertRelation(int $itemId, string $table, string $nameCol, array $rows): void
     {
         $masterMap = [
+            'item_actresses' => 'actresses',
             'item_genres' => 'genres',
             'item_makers' => 'makers',
             'item_series' => 'series_master',
@@ -357,8 +358,14 @@ class DugaSyncService
 
             $masterTable = $masterMap[$table] ?? null;
             if (is_string($masterTable) && $masterTable !== '' && $dugaId !== '') {
-                $this->pdo->prepare("INSERT INTO {$masterTable}(duga_id,name,updated_at) VALUES(?,?,NOW()) ON DUPLICATE KEY UPDATE name=VALUES(name), updated_at=NOW()")
-                    ->execute([$dugaId, $name]);
+                if ($masterTable === 'actresses') {
+                    $ruby = trim((string)($row['ruby'] ?? ''));
+                    $this->pdo->prepare('INSERT INTO actresses(duga_id,name,ruby,updated_at) VALUES(?,?,NULLIF(?, ""),NOW()) ON DUPLICATE KEY UPDATE name=VALUES(name), ruby=COALESCE(NULLIF(VALUES(ruby), ""), ruby), updated_at=NOW()')
+                        ->execute([$dugaId, $name, $ruby]);
+                } else {
+                    $this->pdo->prepare("INSERT INTO {$masterTable}(duga_id,name,updated_at) VALUES(?,?,NOW()) ON DUPLICATE KEY UPDATE name=VALUES(name), updated_at=NOW()")
+                        ->execute([$dugaId, $name]);
+                }
             }
         }
     }
@@ -400,4 +407,3 @@ class DugaSyncService
 
     }
 }
-

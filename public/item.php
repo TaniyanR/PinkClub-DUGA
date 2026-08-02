@@ -519,43 +519,48 @@ $performerText = implode('、', array_values(array_filter(array_map(static fn($v
 $genreText = implode('、', array_values(array_filter(array_map(static fn($v) => trim((string)($v['name'] ?? '')), $genres), static fn($v) => $v !== '')));
 $performerLinks = [];
 foreach ($actresses as $actressRow) {
+    $actressId = (int)($actressRow['id'] ?? 0);
     $actressName = trim((string)($actressRow['name'] ?? ''));
-    if ($actressName === '') {
+    if ($actressId <= 0 || $actressName === '') {
         continue;
     }
-    $performerLinks[] = '<a href="' . e(public_url('search.php') . '?' . http_build_query(['q' => $actressName])) . '">' . e($actressName) . '</a>';
+    $performerLinks[] = '<a href="' . e(public_url('actress.php') . '?id=' . rawurlencode((string)$actressId)) . '">' . e($actressName) . '</a>';
 }
 $genreLinks = [];
 foreach ($genres as $genreRow) {
+    $genreId = (int)($genreRow['id'] ?? 0);
     $genreName = trim((string)($genreRow['name'] ?? ''));
-    if ($genreName === '') {
+    if ($genreId <= 0 || $genreName === '') {
         continue;
     }
-    $genreLinks[] = '<a href="' . e(public_url('search.php') . '?' . http_build_query(['q' => $genreName])) . '">' . e($genreName) . '</a>';
+    $genreLinks[] = '<a href="' . e(public_url('genre.php') . '?id=' . rawurlencode((string)$genreId)) . '">' . e($genreName) . '</a>';
 }
 $seriesLinks = [];
 foreach ($seriesList as $seriesRow) {
+    $seriesId = (int)($seriesRow['id'] ?? 0);
     $seriesName = trim((string)($seriesRow['name'] ?? ''));
-    if ($seriesName === '') {
+    if ($seriesId <= 0 || $seriesName === '') {
         continue;
     }
-    $seriesLinks[] = '<a href="' . e(public_url('search.php') . '?' . http_build_query(['q' => $seriesName])) . '">' . e($seriesName) . '</a>';
+    $seriesLinks[] = '<a href="' . e(public_url('series_detail.php') . '?id=' . rawurlencode((string)$seriesId)) . '">' . e($seriesName) . '</a>';
 }
 $makerLinks = [];
 foreach ($makers as $makerRow) {
+    $makerId = (int)($makerRow['id'] ?? 0);
     $makerName = trim((string)($makerRow['name'] ?? ''));
-    if ($makerName === '') {
+    if ($makerId <= 0 || $makerName === '') {
         continue;
     }
-    $makerLinks[] = '<a href="' . e(public_url('search.php') . '?' . http_build_query(['q' => $makerName])) . '">' . e($makerName) . '</a>';
+    $makerLinks[] = '<a href="' . e(public_url('maker.php') . '?id=' . rawurlencode((string)$makerId)) . '">' . e($makerName) . '</a>';
 }
 $authorLinks = [];
 foreach ($authors as $authorRow) {
+    $authorId = (int)($authorRow['id'] ?? 0);
     $authorName = trim((string)($authorRow['name'] ?? ''));
-    if ($authorName === '') {
+    if ($authorId <= 0 || $authorName === '') {
         continue;
     }
-    $authorLinks[] = '<a href="' . e(public_url('search.php') . '?' . http_build_query(['q' => $authorName])) . '">' . e($authorName) . '</a>';
+    $authorLinks[] = '<a href="' . e(public_url('author.php') . '?id=' . rawurlencode((string)$authorId)) . '">' . e($authorName) . '</a>';
 }
 $tagText = item_pick_raw_text($raw, ['tag', 'tags']);
 if ($tagText === '') {
@@ -720,7 +725,7 @@ require __DIR__ . '/partials/header.php';
           <tr><th style="text-align:left; font-weight:700; padding:4px 8px 4px 0; white-space:nowrap; border:0;">作者</th><td style="padding:4px 0; border:0;"><?= $authorLinks !== [] ? implode('、', $authorLinks) : '―' ?></td></tr>
           <tr><th style="text-align:left; font-weight:700; padding:4px 8px 4px 0; white-space:nowrap; border:0;">シリーズ</th><td style="padding:4px 0; border:0;"><?= $seriesLinks !== [] ? implode('、', $seriesLinks) : e($rawSeriesName !== '' ? $rawSeriesName : '―') ?></td></tr>
           <tr><th style="text-align:left; font-weight:700; padding:4px 8px 4px 0; white-space:nowrap; border:0;">メーカー</th><td style="padding:4px 0; border:0;"><?= $makerLinks !== [] ? implode('、', $makerLinks) : e($rawMakerName !== '' ? $rawMakerName : '―') ?></td></tr>
-          <tr><th style="text-align:left; font-weight:700; padding:4px 8px 4px 0; white-space:nowrap; border:0;">レーベル</th><td style="padding:4px 0; border:0;"><?= $labelName !== '' ? '<a href="' . e(public_url('search.php') . '?' . http_build_query(['q' => $labelName])) . '">' . e($labelName) . '</a>' : '―' ?></td></tr>
+          <tr><th style="text-align:left; font-weight:700; padding:4px 8px 4px 0; white-space:nowrap; border:0;">レーベル</th><td style="padding:4px 0; border:0;"><?= $labelName !== '' ? '<a href="' . e(public_url('label.php') . '?' . http_build_query(['name' => $labelName])) . '">' . e($labelName) . '</a>' : '―' ?></td></tr>
           <tr><th style="text-align:left; font-weight:700; padding:4px 8px 4px 0; white-space:nowrap; border:0;">ジャンル</th><td style="padding:4px 0; border:0;"><?= $genreLinks !== [] ? implode('、', $genreLinks) : e($genreText !== '' ? $genreText : '―') ?></td></tr>
           <tr><th style="text-align:left; font-weight:700; padding:4px 8px 4px 0; white-space:nowrap; border:0;">関連タグ</th><td style="padding:4px 0; border:0;"><?= $tagLinks !== [] ? implode(' ', $tagLinks) : e($tagText !== '' ? $tagText : '―') ?></td></tr>
         </tbody>

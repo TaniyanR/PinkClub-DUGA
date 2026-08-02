@@ -16,8 +16,7 @@ foreach ($rows as $r) {
     }
 
     $name = trim((string)($r['name'] ?? ''));
-    $dmmId = trim((string)($r['duga_id'] ?? ''));
-    if ($name === '' || pcf_is_noise_name($name) || str_starts_with($dmmId, 'name:')) {
+    if ($name === '' || pcf_is_noise_name($name)) {
         continue;
     }
 

@@ -139,13 +139,21 @@ final class DugaApiClient
         if (array_key_exists('appid', $query)) {
             $query['appid'] = '***';
         }
+        if (array_key_exists('agentid', $query)) {
+            $query['agentid'] = '***';
+        }
         return $query;
     }
 
     private function redactSensitiveText(string $text, array $query): string
     {
-        $appId = trim((string)($query['appid'] ?? ''));
-        return $appId === '' ? $text : str_replace($appId, '***', $text);
+        foreach (['appid', 'agentid'] as $key) {
+            $value = trim((string)($query[$key] ?? ''));
+            if ($value !== '') {
+                $text = str_replace($value, '***', $text);
+            }
+        }
+        return $text;
     }
 
     private function fetchCachedResponse(string $requestHash): ?array
@@ -207,4 +215,3 @@ final class DugaApiClient
         }
     }
 }
-

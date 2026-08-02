@@ -61,8 +61,8 @@ if (!is_array($row)) {
 }
 
 $actressDisplayName = trim((string)($row['name'] ?? ''));
-$dmmId = trim((string)($row['duga_id'] ?? ''));
-if ($actressDisplayName === '' || is_invalid_actress_name($actressDisplayName) || str_starts_with($dmmId, 'name:') || !ctype_digit($dmmId)) {
+$dugaId = trim((string)($row['duga_id'] ?? ''));
+if ($actressDisplayName === '' || is_invalid_actress_name($actressDisplayName) || $dugaId === '') {
     require __DIR__ . '/404.php';
 }
 
@@ -79,7 +79,7 @@ $hasNext = false;
 $actressItemsLoaded = false;
 
 $profile = [
-    'duga_id' => $dmmId,
+    'duga_id' => $dugaId,
     'name' => $actressDisplayName,
     'ruby' => (string)($row['ruby'] ?? ''),
     'birthday' => (string)($row['birthday'] ?? ''),
@@ -153,7 +153,7 @@ $accessRankingRows = array_values(array_filter(
         }
         $rankingName = trim((string)($rankingRow['name'] ?? ''));
         $rankingDugaId = trim((string)($rankingRow['duga_id'] ?? ''));
-        return $rankingName !== '' && !is_invalid_actress_name($rankingName) && ctype_digit($rankingDugaId);
+        return $rankingName !== '' && !is_invalid_actress_name($rankingName) && $rankingDugaId !== '';
     }
 ));
 

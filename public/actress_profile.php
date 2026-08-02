@@ -64,14 +64,14 @@ if (!is_array($row)) {
     actress_profile_json_response(['success' => false], 404);
 }
 
-$dmmId = trim((string)($row['duga_id'] ?? ''));
+$dugaId = trim((string)($row['duga_id'] ?? ''));
 $name = trim((string)($row['name'] ?? ''));
-if ($name === '' || !ctype_digit($dmmId)) {
+if ($name === '' || $dugaId === '') {
     actress_profile_json_response(['success' => false], 404);
 }
 
 $profile = [
-    'duga_id' => $dmmId,
+    'duga_id' => $dugaId,
     'name' => $name,
     'ruby' => (string)($row['ruby'] ?? ''),
     'birthday' => (string)($row['birthday'] ?? ''),
