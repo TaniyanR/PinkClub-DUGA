@@ -28,6 +28,25 @@
     }
   };
 
+  const safeSameOriginUrl = (value) => {
+    try {
+      const url = new URL(String(value || ''), window.location.origin);
+      return url.origin === window.location.origin ? url.href : '';
+    } catch (_) {
+      return '';
+    }
+  };
+
+  const normalizeImageFallbacks = (value, primary = '') => {
+    if (!Array.isArray(value)) return [];
+    const fallbacks = [];
+    value.forEach((candidate) => {
+      const url = safeImageUrl(candidate);
+      if (url && url !== primary && !fallbacks.includes(url)) fallbacks.push(url);
+    });
+    return fallbacks.slice(0, 20);
+  };
+
   const itemUrlForId = (id, storedUrl = '') => {
     const numericId = Number.parseInt(String(id || ''), 10);
     if (!Number.isInteger(numericId) || numericId <= 0) return '';
@@ -83,11 +102,13 @@
     const url = itemUrlForId(id, entry.url);
     if (!Number.isInteger(id) || id <= 0 || title === '' || url === '') return null;
 
+    const image = safeImageUrl(entry.image);
     return {
       version: 1,
       id,
       title,
-      image: safeImageUrl(entry.image),
+      image,
+      image_fallbacks: normalizeImageFallbacks(entry.image_fallbacks, image),
       url,
       viewedAt: Number.isFinite(Number(entry.viewedAt)) ? Number(entry.viewedAt) : 0,
       viewCount: Math.max(1, Math.min(999, Number.parseInt(String(entry.viewCount || 1), 10) || 1)),
@@ -164,13 +185,26 @@
     if (!title) return;
 
     const imageMeta = document.querySelector('meta[property="og:image"]');
+    const packageImage = document.querySelector('[data-package-image="1"]');
+    let packageFallbacks = [];
+    if (packageImage && packageImage.dataset.imageFallbacks) {
+      try {
+        packageFallbacks = JSON.parse(packageImage.dataset.imageFallbacks);
+      } catch (_) {}
+    }
+    const primaryImage = safeImageUrl(
+      (packageImage && (packageImage.currentSrc || packageImage.src)) ||
+      (imageMeta && imageMeta.content) ||
+      ''
+    );
     const previous = readHistory();
     const existing = previous.find((entry) => entry.id === id);
     const record = {
       version: 1,
       id,
       title: title.slice(0, 300),
-      image: safeImageUrl((imageMeta && imageMeta.content) || ''),
+      image: primaryImage,
+      image_fallbacks: normalizeImageFallbacks(packageFallbacks, primaryImage),
       url: itemUrlForId(id, window.location.href),
       viewedAt: Date.now(),
       viewCount: Math.min(999, Number(existing ? existing.viewCount : 0) + 1),
@@ -197,7 +231,80 @@
     return node;
   };
 
-  const renderHistory = () => {
+  const appendImage = (imageLink, entry) => {
+    const candidates = [entry.image, ...(entry.image_fallbacks || [])]
+      .map(safeImageUrl)
+      .filter((url, index, values) => url && values.indexOf(url) === index);
+    if (candidates.length === 0) {
+      imageLink.appendChild(createNoImage());
+      return;
+    }
+
+    const image = createElement('img', 'pcf-recent__card-image');
+    image.alt = entry.title;
+    image.loading = 'lazy';
+    image.decoding = 'async';
+    let candidateIndex = 0;
+    image.addEventListener('error', () => {
+      candidateIndex += 1;
+      if (candidateIndex < candidates.length) {
+        image.src = candidates[candidateIndex];
+        return;
+      }
+      image.replaceWith(createNoImage());
+    });
+    image.src = candidates[0];
+    imageLink.appendChild(image);
+  };
+
+  const refreshHistoryImages = async (history, section) => {
+    const endpoint = safeSameOriginUrl(section.dataset.endpoint);
+    if (!endpoint || history.length === 0) return history;
+
+    try {
+      const url = new URL(endpoint);
+      url.searchParams.set('ids', history.map((entry) => entry.id).join(','));
+      const response = await fetch(url.href, {
+        credentials: 'same-origin',
+        headers: { Accept: 'application/json' },
+        cache: 'no-store'
+      });
+      if (!response.ok) return history;
+      const payload = await response.json();
+      if (!payload || !Array.isArray(payload.items)) return history;
+
+      const currentById = new Map();
+      payload.items.forEach((item) => {
+        const normalized = normalizeEntry({
+          ...item,
+          viewedAt: history.find((entry) => entry.id === Number(item.id))?.viewedAt || 0,
+          viewCount: history.find((entry) => entry.id === Number(item.id))?.viewCount || 1
+        });
+        if (normalized) currentById.set(normalized.id, normalized);
+      });
+
+      return history.map((entry) => {
+        const current = currentById.get(entry.id);
+        if (!current) return entry;
+        return {
+          ...entry,
+          title: current.title || entry.title,
+          image: current.image || entry.image,
+          image_fallbacks: current.image_fallbacks.length > 0
+            ? current.image_fallbacks
+            : entry.image_fallbacks,
+          url: current.url || entry.url
+        };
+      });
+    } catch (_) {
+      return history;
+    }
+  };
+
+  let renderSequence = 0;
+
+  const renderHistory = async () => {
+    const sequence = ++renderSequence;
     const section = document.getElementById('pcf-recently-viewed');
     const list = document.getElementById('pcf-recent-list');
     const clearButton = document.getElementById('pcf-recent-clear');
@@ -221,7 +328,7 @@
       renderHistory();
     };
 
-    const history = readHistory().slice(0, MAX_RENDERED);
+    let history = readHistory().slice(0, MAX_RENDERED);
     list.replaceChildren();
 
     if (history.length === 0) {
@@ -237,6 +344,12 @@
     }
 
     restore.hidden = true;
+    history = await refreshHistoryImages(history, section);
+    if (sequence !== renderSequence) return;
+    writeHistory([
+      ...history,
+      ...readHistory().filter((entry) => !history.some((current) => current.id === entry.id))
+    ]);
 
     history.forEach((entry) => {
       const article = createElement('article', 'pcf-recent__card');
@@ -244,17 +357,7 @@
       imageLink.href = entry.url;
       imageLink.setAttribute('aria-label', entry.title);
 
-      if (entry.image) {
-        const image = createElement('img', 'pcf-recent__card-image');
-        image.src = entry.image;
-        image.alt = entry.title;
-        image.loading = 'lazy';
-        image.decoding = 'async';
-        image.addEventListener('error', () => image.replaceWith(createNoImage()), { once: true });
-        imageLink.appendChild(image);
-      } else {
-        imageLink.appendChild(createNoImage());
-      }
+      appendImage(imageLink, entry);
 
       const titleLink = createElement('a', 'pcf-recent__card-title', entry.title);
       titleLink.href = entry.url;

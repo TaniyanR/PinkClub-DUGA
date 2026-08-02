@@ -337,9 +337,9 @@ if (!function_exists('pcf_item_image_candidates')) {
             $value = trim((string)$candidate);
             return $value !== '' && !pcf_is_self_hosted_duga_image_url($value) ? $value : '';
         }, array_merge(
+            $packageCandidates,
             $rawPackageCandidates,
             $explicitPackageCandidates,
-            $packageCandidates,
             $sampleCandidates
         )))));
     }
