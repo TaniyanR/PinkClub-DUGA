@@ -784,6 +784,27 @@
 .pcf-dm-card__button { display:block; width:100%; padding:12px 10px; text-align:center; text-decoration:none; color:#fff; background:#2457d6; border-radius:4px; font-size:14px; font-weight:700; box-sizing:border-box; }
 .pcf-dm-card__button:hover { background:#1848b6; }
 .pcf-dm-card__button.is-disabled { background:#9ca3af; color:#fff; cursor:not-allowed; }
+/* DUGAの縦長・横長パッケージを、FANZA版と同じ高さのカード枠へ収める。 */
+@media (min-width: 769px) {
+  .site-main--legacy .home-feature-section .rail-row--no-scroll .rail-card > a:first-child {
+    display: flex;
+    width: 100%;
+    height: 286px;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: hidden;
+    background: #fff;
+  }
+  .site-main--legacy .home-feature-section .rail-row--no-scroll .rail-card .thumb,
+  .site-main--legacy .home-feature-section .rail-row--no-scroll .rail-card .rail-card__noimage {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 286px !important;
+    object-fit: contain;
+    object-position: center top;
+    background: #fff;
+  }
+}
 .pcf-item-main__info table {
   table-layout: fixed;
 }

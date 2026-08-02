@@ -38,7 +38,7 @@ try {
     $stmt = db()->prepare(
         'SELECT items.* FROM items' .
         ' WHERE items.id IN (' . implode(',', $placeholders) . ')' .
-        ' AND ' . items_product_source_where('items')
+        ' AND ' . items_front_release_where('items')
     );
     $stmt->execute($params);
     foreach ($stmt->fetchAll() ?: [] as $row) {

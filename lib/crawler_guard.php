@@ -17,7 +17,7 @@ function pcf_crawler_guard_request_path(): string
 
 function pcf_crawler_guard_is_public_heavy_path(string $path): bool
 {
-    return preg_match('#/(?:public/)?item\.php$#', $path) === 1;
+    return preg_match('#/(?:public/)?(?:item|actress|series_detail)\.php$#', $path) === 1;
 }
 
 function pcf_crawler_guard_is_known_crawler(string $userAgent): bool

@@ -23,8 +23,7 @@ declare(strict_types=1);
 .pcf-recommendations__control{padding:7px 10px;font-size:12px;white-space:nowrap}
 .pcf-recommendations__list{display:flex;gap:14px;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:thin}
 .pcf-recommendations__card{flex:0 0 180px;min-width:180px}
-.pcf-recommendations__image{display:block;width:180px;height:250px;object-fit:contain;object-position:center;background:#eee;border-radius:6px}
-img.pcf-recommendations__image{background:#fff}
+.pcf-recommendations__image{display:block;width:180px;height:250px;object-fit:cover;border-radius:6px;background:#eee}
 .pcf-recommendations__title{display:-webkit-box;margin:8px 0 6px;overflow:hidden;color:#1670b7;font-size:14px;font-weight:700;line-height:1.45;text-decoration:none;-webkit-box-orient:vertical;-webkit-line-clamp:3}
 .pcf-recommendations__reason{margin:0;color:#666;font-size:11px;line-height:1.45}
 .pcf-recommendations-restore{margin:10px 0 20px;text-align:right}
