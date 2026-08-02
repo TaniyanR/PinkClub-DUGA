@@ -151,10 +151,16 @@ foreach (array_slice($rows, 0, 10) as $row) {
         continue;
     }
     $reasonKeys = array_keys((array)($scores[$id]['reasons'] ?? []));
+    $imageCandidates = pcf_item_image_candidates($row);
+    $image = (string)($imageCandidates[0] ?? '');
     $items[] = [
         'id' => $id,
         'title' => pcf_item_title($row),
-        'image' => pcf_item_image($row),
+        'image' => $image,
+        'image_fallbacks' => array_values(array_filter(
+            array_slice($imageCandidates, 1),
+            static fn($url): bool => trim((string)$url) !== '' && trim((string)$url) !== $image
+        )),
         'url' => public_url('item.php?id=' . $id),
         'reason' => (string)($reasonKeys[0] ?? '閲覧傾向に近い作品'),
     ];

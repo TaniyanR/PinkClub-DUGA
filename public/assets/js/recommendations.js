@@ -175,14 +175,26 @@
         imageLink.href = pageUrl;
         imageLink.setAttribute('aria-label', title);
 
-        const imageUrl = safeUrl(item.image);
-        if (imageUrl) {
+        const imageUrls = [];
+        [item.image, ...(Array.isArray(item.image_fallbacks) ? item.image_fallbacks : [])].forEach((candidate) => {
+          const imageUrl = safeUrl(candidate);
+          if (imageUrl && !imageUrls.includes(imageUrl)) imageUrls.push(imageUrl);
+        });
+        if (imageUrls.length) {
           const image = createElement('img', 'pcf-recommendations__image');
-          image.src = imageUrl;
+          let imageIndex = 0;
+          image.src = imageUrls[imageIndex];
           image.alt = title;
           image.loading = 'lazy';
           image.decoding = 'async';
-          image.addEventListener('error', () => image.replaceWith(createNoImage()), { once: true });
+          image.addEventListener('error', () => {
+            imageIndex += 1;
+            if (imageIndex < imageUrls.length) {
+              image.src = imageUrls[imageIndex];
+              return;
+            }
+            image.replaceWith(createNoImage());
+          });
           imageLink.appendChild(image);
         } else {
           imageLink.appendChild(createNoImage());
