@@ -710,7 +710,6 @@ require __DIR__ . '/partials/header.php';
         <img class="pcf-detail__package" data-package-image="1" src="<?= e($packageImage) ?>" alt="<?= e((string)($item['title'] ?? '')) ?>"<?= $packageImageFallbackAttr ?> style="display:block; width:100%; height:auto;">
       </a>
       <?php endif; ?>
-      <?php if ($desc !== ''): ?><p><?= nl2br(e($desc)) ?></p><?php endif; ?>
     </div>
 
     <div class="pcf-item-main__info">
@@ -731,6 +730,10 @@ require __DIR__ . '/partials/header.php';
         </tbody>
       </table>
     </div>
+
+    <?php if ($desc !== ''): ?>
+      <p class="pcf-item-main__description"><?= nl2br(e($desc)) ?></p>
+    <?php endif; ?>
   </section>
 
   <?php if ($affiliateUrl !== ''): ?>
