@@ -789,7 +789,7 @@
   .site-main--legacy .home-feature-section .rail-row--no-scroll .rail-card > a:first-child {
     display: flex;
     width: 100%;
-    height: 170px;
+    height: 286px;
     align-items: flex-start;
     justify-content: center;
     overflow: hidden;
@@ -799,7 +799,7 @@
   .site-main--legacy .home-feature-section .rail-row--no-scroll .rail-card .rail-card__noimage {
     width: 100% !important;
     max-width: 100% !important;
-    height: 170px !important;
+    height: 286px !important;
     object-fit: contain;
     object-position: center top;
     background: #fff;

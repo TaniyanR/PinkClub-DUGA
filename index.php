@@ -355,6 +355,40 @@ function pick_full_package_image(array $item): string
     return '';
 }
 
+function pick_top_card_image_candidates(array $item): array
+{
+    $candidates = [];
+    $raw = decode_item_raw($item);
+
+    // DUGAの上段カードは、FANZA版と同じ縦型カードになるよう
+    // 商品APIのposterimageを最優先にする。
+    if (function_exists('pcf_image_candidates_from_mixed')) {
+        foreach (['posterimage', 'poster'] as $key) {
+            $candidates = array_merge(
+                $candidates,
+                pcf_image_candidates_from_mixed($raw[$key] ?? null)
+            );
+        }
+    }
+
+    foreach (['image_small', 'image_large'] as $key) {
+        $candidate = normalize_index_image_url((string)($item[$key] ?? ''));
+        if ($candidate !== '') {
+            $candidates[] = $candidate;
+        }
+    }
+
+    // posterimageがない商品だけ、フルパッケージ等へ安全にフォールバックする。
+    if (function_exists('pcf_item_image_candidates')) {
+        $candidates = array_merge($candidates, pcf_item_image_candidates($item));
+    }
+
+    return array_values(array_unique(array_filter(array_map(
+        static fn($url): string => normalize_index_image_url((string)$url),
+        $candidates
+    ))));
+}
+
 function render_item_card(array $item, int $width = 180, ?array $taxonomy = null, bool $preferFullPackageImage = false, bool $lazyLoad = true): void
 {
     $itemUrl = app_url('public/item.php?id=' . (int)$item['id']);
@@ -363,17 +397,15 @@ function render_item_card(array $item, int $width = 180, ?array $taxonomy = null
     $movieClass = $sample['movie_url'] !== '' ? 'sample-button sample-button--enabled' : 'sample-button sample-button--disabled';
     $imageClass = $sample['has_images'] ? 'sample-button sample-button--enabled' : 'sample-button sample-button--disabled';
     $sampleImagesUrl = public_url('sample_images.php?content_id=' . rawurlencode((string)($item['content_id'] ?? '')));
-    $thumbUrl = pick_full_package_image($item);
-    if ($thumbUrl === '') {
-        $thumbUrl = trim((string)($item['image_small'] ?? ''));
-    }
-    if ($thumbUrl === '') {
-        $thumbUrl = trim((string)($item['image_large'] ?? ''));
-    }
-    $imageFallbacks = [];
-    if (function_exists('pcf_item_image_candidates')) {
-        $imageFallbacks = array_values(array_filter(pcf_item_image_candidates($item), static fn($url): bool => trim((string)$url) !== '' && trim((string)$url) !== $thumbUrl));
-    }
+    $imageCandidates = $preferFullPackageImage && function_exists('pcf_item_image_candidates')
+        ? pcf_item_image_candidates($item)
+        : pick_top_card_image_candidates($item);
+    $imageCandidates = array_values(array_unique(array_filter(array_map(
+        static fn($url): string => normalize_index_image_url((string)$url),
+        $imageCandidates
+    ))));
+    $thumbUrl = (string)($imageCandidates[0] ?? '');
+    $imageFallbacks = array_slice($imageCandidates, 1);
     $imageFallbackAttr = $imageFallbacks !== [] ? ' data-image-fallbacks="' . e((string)json_encode($imageFallbacks, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) . '"' : '';
     ?>
     <article class="card rail-card rail-card--<?= (int)$width ?>" style="width:<?= (int)$width ?>px;min-width:<?= (int)$width ?>px;max-width:<?= (int)$width ?>px;">

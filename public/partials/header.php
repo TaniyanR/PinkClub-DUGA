@@ -116,7 +116,6 @@ $relNextHref = isset($relNext) && is_string($relNext) && $relNext !== '' ? $relN
   <link rel="stylesheet" href="<?= e(asset_url('css/style.css')) ?>">
   <link rel="stylesheet" href="<?= e(asset_url('css/public-ui.css')) ?>">
   <script src="<?= e(asset_url('js/recently-viewed.js')) ?>" defer></script>
-  <script src="<?= e(asset_url('js/recommendations.js')) ?>" defer></script>
   <script src="<?= e(asset_url('js/item-detail-fixes.js')) ?>" defer></script>
   <script>
   document.addEventListener('DOMContentLoaded', () => {
@@ -300,5 +299,4 @@ $relNextHref = isset($relNext) && is_string($relNext) && $relNext !== '' ? $relN
     <?php if ($scriptName === 'index.php'): ?>
       <?php require __DIR__ . '/home_mood.php'; ?>
       <?php require __DIR__ . '/home_recently_viewed.php'; ?>
-      <?php require __DIR__ . '/home_recommendations.php'; ?>
     <?php endif; ?>
