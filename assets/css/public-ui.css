@@ -784,13 +784,26 @@
 .pcf-dm-card__button { display:block; width:100%; padding:12px 10px; text-align:center; text-decoration:none; color:#fff; background:#2457d6; border-radius:4px; font-size:14px; font-weight:700; box-sizing:border-box; }
 .pcf-dm-card__button:hover { background:#1848b6; }
 .pcf-dm-card__button.is-disabled { background:#9ca3af; color:#fff; cursor:not-allowed; }
-.pcf-item-main {
-  grid-template-columns: minmax(0, 620px) minmax(220px, 360px);
-  justify-content: start;
-  gap: 18px;
-}
 .pcf-item-main__info table {
   table-layout: fixed;
+}
+.pcf-item-main__media {
+  width: min(100%, 460px);
+}
+.pcf-item-main__media > a {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: flex-start;
+}
+.pcf-item-main__media .pcf-detail__package {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+  object-position: center top;
 }
 .pcf-item-main__info th {
   width: 120px;

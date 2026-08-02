@@ -704,10 +704,10 @@ require __DIR__ . '/partials/header.php';
   <?php endif; ?>
 
   <section class="pcf-detail pcf-item-main">
-    <div class="pcf-item-main__media" style="width:min(100%, 620px);">
+    <div class="pcf-item-main__media">
       <?php if ($packageImage !== ''): ?>
       <a href="<?= e($packageImage) ?>" target="_blank" rel="noopener noreferrer">
-        <img class="pcf-detail__package" data-package-image="1" src="<?= e($packageImage) ?>" alt="<?= e((string)($item['title'] ?? '')) ?>"<?= $packageImageFallbackAttr ?> style="display:block; width:100%; height:auto;">
+        <img class="pcf-detail__package" data-package-image="1" src="<?= e($packageImage) ?>" alt="<?= e((string)($item['title'] ?? '')) ?>"<?= $packageImageFallbackAttr ?>>
       </a>
       <?php endif; ?>
     </div>
@@ -875,27 +875,6 @@ require __DIR__ . '/partials/header.php';
     imageViewer.style.display = 'none';
     imageViewerMain.src = '';
   };
-
-  const packageImage = document.querySelector('[data-package-image="1"]');
-  const adjustPackageImage = () => {
-    if (!packageImage || !packageImage.naturalWidth || !packageImage.naturalHeight) return;
-    if (packageImage.naturalHeight <= packageImage.naturalWidth) return;
-    packageImage.style.width = 'auto';
-    packageImage.style.maxWidth = '100%';
-    packageImage.style.height = '400px';
-    packageImage.style.maxHeight = '400px';
-    packageImage.style.objectFit = 'contain';
-    packageImage.style.objectPosition = 'center top';
-    packageImage.style.marginLeft = 'auto';
-    packageImage.style.marginRight = 'auto';
-  };
-  if (packageImage) {
-    if (packageImage.complete) {
-      adjustPackageImage();
-    } else {
-      packageImage.addEventListener('load', adjustPackageImage, { once: true });
-    }
-  }
 
   const closeMovie = () => {
     if (!modal || !frame || !titleNode) return;

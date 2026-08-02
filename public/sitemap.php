@@ -77,6 +77,10 @@ $staticUrls = [
 ];
 $tables = [
     ['items', 'item.php', 'weekly', '0.8', items_front_release_where()],
+    ['genres', 'genre.php', 'daily', '0.9'],
+    ['series_master', 'series_detail.php', 'daily', '0.9'],
+    ['actresses', 'actress.php', 'daily', '0.9'],
+    ['makers', 'maker.php', 'daily', '0.9'],
 ];
 $totalUrls = count($staticUrls);
 foreach ($tables as $table) {

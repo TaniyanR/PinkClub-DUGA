@@ -115,6 +115,8 @@ $relNextHref = isset($relNext) && is_string($relNext) && $relNext !== '' ? $relN
   <?php endif; ?>
   <link rel="stylesheet" href="<?= e(asset_url('css/style.css')) ?>">
   <link rel="stylesheet" href="<?= e(asset_url('css/public-ui.css')) ?>">
+  <script src="<?= e(asset_url('js/recently-viewed.js')) ?>" defer></script>
+  <script src="<?= e(asset_url('js/recommendations.js')) ?>" defer></script>
   <script src="<?= e(asset_url('js/item-detail-fixes.js')) ?>" defer></script>
   <script>
   document.addEventListener('DOMContentLoaded', () => {
@@ -287,7 +289,7 @@ $relNextHref = isset($relNext) && is_string($relNext) && $relNext !== '' ? $relN
   <?php require __DIR__ . '/sidebar.php'; ?>
   <main class="content site-main site-main--legacy">
     <?php $scriptName = basename((string)($_SERVER['SCRIPT_NAME'] ?? '')); ?>
-    <?php $autoBreadcrumbSkip = ['item.php']; ?>
+    <?php $autoBreadcrumbSkip = ['item.php', 'genre.php', 'series_detail.php', 'series_one.php', 'author.php', 'maker.php', 'actress.php', 'label.php']; ?>
     <?php if ($scriptName !== 'index.php' && !in_array($scriptName, $autoBreadcrumbSkip, true)): ?>
       <nav class="pcf-breadcrumb" aria-label="パンくず">
         <span class="pcf-breadcrumb__item"><a href="<?= e(public_url('')) ?>">ホーム</a></span>
@@ -295,3 +297,8 @@ $relNextHref = isset($relNext) && is_string($relNext) && $relNext !== '' ? $relN
       </nav>
     <?php endif; ?>
     <div class="site-main__body">
+    <?php if ($scriptName === 'index.php'): ?>
+      <?php require __DIR__ . '/home_mood.php'; ?>
+      <?php require __DIR__ . '/home_recently_viewed.php'; ?>
+      <?php require __DIR__ . '/home_recommendations.php'; ?>
+    <?php endif; ?>
